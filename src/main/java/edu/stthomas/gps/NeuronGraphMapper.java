@@ -10,10 +10,10 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
-public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper, IntWritable, MultiWritableWrapper> {
+public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper, IntWritable, NeuronWritable> {
 
 	private IntWritable neuron_id = new IntWritable(); // key
-	private MultiWritableWrapper multi_writable = new MultiWritableWrapper(); // value
+	private NeuronWritable synaptic_weight = new NeuronWritable();
 	private Random randn = new Random();
 
 	private enum Firing {
@@ -56,23 +56,22 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 
 		// Start Neuron Evolution
 		this.neuronEvolution(current, neuron);
+		//System.err.println(neuron.toString());
 
 		// Check if the neuron has fired.
 		if (neuron.potential >= 30.0) { // fired
 			AdjListWritable adjlist_writable = value.getAdjListWritable();
-			System.err.println(value.getWritableType() + "\t" + value.getWeight() + value.getNeuronWritable().toString());
+			//System.err.println(value.getWritableType() + "\t" + value.getWeight() + value.getNeuronWritable().toString());
 			ArrayList<SynapticWeightWritable> adjlist = adjlist_writable.toArrayList();
 
 			// Emit synaptic weights by iterating the adjacency list. 
 			for (SynapticWeightWritable weight : adjlist) {
-				multi_writable.setWritableType(MultiWritableWrapper.Synaptic_Weight);
-				multi_writable.setWeight(weight.getWeight());
-				multi_writable.setNeuronWritable(null);
-				multi_writable.setAdjListWritable(null);
+				synaptic_weight.setTypeOfValue('W');
+				synaptic_weight.setWeight(weight.getWeight());
 
 				neuron_id.set(weight.getID());
 
-				context.write(neuron_id, multi_writable);
+				context.write(neuron_id, synaptic_weight);
 			}
 
 			// Reset the membrane potential (voltage) and membrane recovery variable after firing.
@@ -83,13 +82,7 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 			context.getCounter(Firing.Count).increment(1);
 		}
 		
-		// Update the multiple writable with the updated neuron object after evolution. 
-		// Other fileds in the multiple writable remained the same.
-		value.setNeuronWritable(neuron);
-	
-		//value.setWritableType(MultiWritableWrapper.NeuronObj);
-		
-		// Emit the whole neuron structure.
-		context.write(key, value);
+		// Emit the neuron structure.
+		context.write(key, neuron);
 	}
 }

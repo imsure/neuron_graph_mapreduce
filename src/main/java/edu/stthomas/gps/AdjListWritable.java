@@ -55,4 +55,8 @@ public class AdjListWritable extends ArrayWritable {
         sb.append("size of ajacency list:").append(adjlist.size());
         return sb.toString();
     }
+	
+	public String printSize() {
+		return Integer.toString(this.get().length);
+	}
 }

@@ -17,7 +17,8 @@ import org.apache.hadoop.util.ToolRunner;
 public class NeuronGraph extends Configured implements Tool {
 
 	public final static int TIME_IN_MS = 20;
-
+	public static int CurrentIterationNum;
+	
 	@Override
 	public int run(String[] args) throws Exception {
 
@@ -39,7 +40,7 @@ public class NeuronGraph extends Configured implements Tool {
 			Job job = new Job(getConf());
 
 			job.setJarByClass(this.getClass());
-			job.setJobName("Neuron Graph Processing:" + timer + "ms");
+			job.setJobName("Neuron Graph Processing:" + timer);
 
 			FileInputFormat.addInputPath(job, new Path(IN));
 			FileOutputFormat.setOutputPath(job, new Path(OUT));
@@ -51,11 +52,19 @@ public class NeuronGraph extends Configured implements Tool {
 
 			job.setMapperClass(NeuronGraphMapper.class);
 			job.setReducerClass(NeuronGraphReducer.class);
+			job.setPartitionerClass(NeuronIDRangePartitioner.class);
+			
 			job.setInputFormatClass(SequenceFileInputFormat.class);
 			job.setOutputFormatClass(SequenceFileOutputFormat.class);
-			job.setNumReduceTasks(12);
+			//job.setNumReduceTasks(0);
+			job.setNumReduceTasks(NeuronIDRangePartitioner.TotalNumOfNeurons /
+					NeuronIDRangePartitioner.NumOfNeuronsPerPartition);
 
+			job.setMapOutputKeyClass(IntWritable.class);
+			job.setMapOutputValueClass(NeuronWritable.class);
+			
 			job.setOutputKeyClass(IntWritable.class);
+			//job.setOutputValueClass(NeuronWritable.class);
 			job.setOutputValueClass(MultiWritableWrapper.class);
 
 			success = job.waitForCompletion(true);
