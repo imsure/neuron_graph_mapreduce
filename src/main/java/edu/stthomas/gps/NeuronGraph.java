@@ -16,8 +16,8 @@ import org.apache.hadoop.util.ToolRunner;
 
 public class NeuronGraph extends Configured implements Tool {
 
-	public final static int TIME_IN_MS = 20;
-	public static int CurrentIterationNum;
+	public final static int TIME_IN_MS = 100;
+	private int time_of_simulation = 0;
 	
 	@Override
 	public int run(String[] args) throws Exception {
@@ -61,7 +61,7 @@ public class NeuronGraph extends Configured implements Tool {
 					NeuronIDRangePartitioner.NumOfNeuronsPerPartition);
 
 			job.setMapOutputKeyClass(IntWritable.class);
-			job.setMapOutputValueClass(NeuronWritable.class);
+			job.setMapOutputValueClass(NeuronStateWritable.class);
 			
 			job.setOutputKeyClass(IntWritable.class);
 			//job.setOutputValueClass(NeuronWritable.class);

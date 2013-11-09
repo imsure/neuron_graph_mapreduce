@@ -18,28 +18,7 @@ public class NeuronWritable implements Writable {
 	public float synaptic_sum = 0;
 	public char fired = 0;
 	
-	// Used to identify if this writable is a neuron structure 
-	// or just containing a synaptic weight value.
-	private char typeOfValue = 0;
-	private float weight = 0;
-	
 	public NeuronWritable() {
-	}
-	
-	public void setTypeOfValue(char type) {
-		this.typeOfValue = type;
-	}
-	
-	public void setWeight(float weight) {
-		this.weight = weight;
-	}
-	
-	public char getTypeOfValue() {
-		return this.typeOfValue;
-	}
-	
-	public float getWeight() {
-		return this.weight;
 	}
 	
 	public void write(DataOutput out) throws IOException {
@@ -53,9 +32,6 @@ public class NeuronWritable implements Writable {
 		out.writeFloat(potential);
 		out.writeFloat(synaptic_sum);
 		out.writeChar(fired);
-		
-		out.writeChar(typeOfValue);
-		out.writeFloat(weight);
 	}
 	
 	public void readFields(DataInput in) throws IOException {
@@ -69,9 +45,6 @@ public class NeuronWritable implements Writable {
 		potential = in.readFloat();
 		synaptic_sum = in.readFloat();
 		fired = in.readChar();
-		
-		typeOfValue = in.readChar();
-		weight = in.readFloat();
 	}
 	
 	@Override
@@ -87,8 +60,6 @@ public class NeuronWritable implements Writable {
 		sb.append(potential).append(',');
 		sb.append(synaptic_sum).append(',');
 		sb.append(fired).append(',');
-		sb.append(typeOfValue).append(',');
-		sb.append(weight);
 		
 		return sb.toString();
 	}

@@ -10,10 +10,10 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
-public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper, IntWritable, NeuronWritable> {
+public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper, IntWritable, NeuronStateWritable> {
 
 	private IntWritable neuron_id = new IntWritable(); // key
-	private NeuronWritable synaptic_weight = new NeuronWritable();
+	private NeuronStateWritable neuron_state = new NeuronStateWritable();
 	private Random randn = new Random();
 
 	private enum Firing {
@@ -64,14 +64,15 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 			//System.err.println(value.getWritableType() + "\t" + value.getWeight() + value.getNeuronWritable().toString());
 			ArrayList<SynapticWeightWritable> adjlist = adjlist_writable.toArrayList();
 
-			// Emit synaptic weights by iterating the adjacency list. 
+			// Emit synaptic weights by iterating the adjacency list.
 			for (SynapticWeightWritable weight : adjlist) {
-				synaptic_weight.setTypeOfValue('W');
-				synaptic_weight.setWeight(weight.getWeight());
+				neuron_state.setTypeOfValue('W');
+				neuron_state.setWeight(weight.getWeight());
+				neuron_state.setNeuron(null); // set to null to save space.
 
 				neuron_id.set(weight.getID());
 
-				context.write(neuron_id, synaptic_weight);
+				context.write(neuron_id, neuron_state);
 			}
 
 			// Reset the membrane potential (voltage) and membrane recovery variable after firing.
@@ -82,7 +83,8 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 			context.getCounter(Firing.Count).increment(1);
 		}
 		
+		neuron_state.setNeuron(neuron);
 		// Emit the neuron structure.
-		context.write(key, neuron);
+		context.write(key, neuron_state);
 	}
 }

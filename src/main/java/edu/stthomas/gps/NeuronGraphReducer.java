@@ -15,10 +15,8 @@ import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.conf.Configuration;
 
 
-public class NeuronGraphReducer extends Reducer<IntWritable, NeuronWritable, IntWritable, MultiWritableWrapper> {
+public class NeuronGraphReducer extends Reducer<IntWritable, NeuronStateWritable, IntWritable, MultiWritableWrapper> {
 
-	private MultiWritableWrapper multi_writable = new MultiWritableWrapper(); // value
-	private NeuronWritable neuron = new NeuronWritable();
 	private SequenceFile.Reader reader;
 	private IntWritable graphPartitonKey = new IntWritable();
 	private MultiWritableWrapper graphPartitonValue = new MultiWritableWrapper();
@@ -63,7 +61,7 @@ public class NeuronGraphReducer extends Reducer<IntWritable, NeuronWritable, Int
 		reader = new SequenceFile.Reader(fs, path, conf);
 	}
 	
-	private boolean isNeuron(NeuronWritable value) {
+	private boolean isNeuron(NeuronStateWritable value) {
 		if (value.getTypeOfValue() == 'W') {
 			return false;
 		} else {
@@ -71,7 +69,7 @@ public class NeuronGraphReducer extends Reducer<IntWritable, NeuronWritable, Int
 		}
 	}
 	
-	public void reduce(IntWritable key, Iterable<NeuronWritable> values, Context context) 
+	public void reduce(IntWritable key, Iterable<NeuronStateWritable> values, Context context) 
 			throws IOException, InterruptedException {
 		
 		if (this.firstCalled == false) {
@@ -90,16 +88,15 @@ public class NeuronGraphReducer extends Reducer<IntWritable, NeuronWritable, Int
 			}
 		}
 		
-		for (NeuronWritable value : values) {
+		for (NeuronStateWritable value : values) {
 			if (!isNeuron(value)) {
 				context.getCounter(Test.weights_count).increment(1);
 				weight_sum += value.getWeight();
 			} else { // Recover the neuron structure.
-				//neuron = value;
-				graphPartitonValue.getNeuronWritable().fired = value.fired;
-				graphPartitonValue.getNeuronWritable().potential = value.potential;
-				graphPartitonValue.getNeuronWritable().recovery = value.recovery;
-				graphPartitonValue.getNeuronWritable().time = value.time;
+				graphPartitonValue.getNeuronWritable().fired = value.getNeuron().fired;
+				graphPartitonValue.getNeuronWritable().potential = value.getNeuron().potential;
+				graphPartitonValue.getNeuronWritable().recovery = value.getNeuron().recovery;
+				graphPartitonValue.getNeuronWritable().time = value.getNeuron().time;
 				context.getCounter(Test.neuron_count).increment(1);
 			}
 		}
@@ -107,15 +104,8 @@ public class NeuronGraphReducer extends Reducer<IntWritable, NeuronWritable, Int
 		// Update synaptic summation for the next iteration. This is the 
 		// only information needs to be updated.
 		graphPartitonValue.getNeuronWritable().synaptic_sum = weight_sum;
-		//graphPartitonValue.setNeuronWritable(neuron);
-		
-		//graphPartitonValue.getNeuronWritable().fired = neuron.fired;
-		//graphPartitonValue.getNeuronWritable().potential = neuron.potential;
-		//graphPartitonValue.getNeuronWritable().recovery = neuron.recovery;
-		//graphPartitonValue.getNeuronWritable().time = neuron.time;
 		
 		context.write(key, graphPartitonValue);
-		//context.write(key, neuron);
 	}
 	
 	@Override
