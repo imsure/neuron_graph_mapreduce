@@ -16,7 +16,7 @@ import org.apache.hadoop.util.ToolRunner;
 
 public class NeuronGraph extends Configured implements Tool {
 
-	public final static int TIME_IN_MS = 20;
+	public final static int TIME_IN_MS = 100;
 
 	@Override
 	public int run(String[] args) throws Exception {
