@@ -83,6 +83,7 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 			context.getCounter(Firing.Count).increment(1);
 		}
 		
+		neuron_state.setTypeOfValue('N');
 		neuron_state.setNeuron(neuron);
 		// Emit the neuron structure.
 		context.write(key, neuron_state);

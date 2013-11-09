@@ -15,6 +15,7 @@ public class NeuronStateWritable implements Writable {
 	private NeuronWritable neuron = null;
 	
 	public NeuronStateWritable() {
+		neuron = new NeuronWritable();
 	}
 	
 	public void setTypeOfValue(char type) {
@@ -44,7 +45,7 @@ public class NeuronStateWritable implements Writable {
 	public void write(DataOutput out) throws IOException {
 		out.writeChar(typeOfValue);
 		out.writeFloat(weight);
-		if (neuron != null) {
+		if (typeOfValue == 'N') {
 			neuron.write(out);
 		}
 	}
@@ -52,10 +53,8 @@ public class NeuronStateWritable implements Writable {
 	public void readFields(DataInput in) throws IOException {
 		typeOfValue = in.readChar();
 		weight = in.readFloat();
-		if (neuron != null) {
+		if (typeOfValue == 'N') {
 			neuron.readFields(in);
 		}
 	}
-	
-	
 }
