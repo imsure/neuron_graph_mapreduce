@@ -78,7 +78,8 @@ public class MultiWritableWrapper implements Writable {
 		if (this.writable_type == Synaptic_Weight) {
 			return Float.toString(weight);
 		} else {
-			return neuron.toString() + "\t" + adjlist.toString();
+			return neuron.toString();
+			//return neuron.toString() + "\t" + adjlist.toString();
 		}
 	}
 }

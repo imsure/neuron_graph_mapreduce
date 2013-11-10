@@ -34,12 +34,12 @@ public class NeuronGraphReducer extends Reducer<IntWritable, MultiWritableWrappe
 		
 		for (MultiWritableWrapper value : values) {
 			if (!isNeuron(value)) {
-				context.getCounter(Test.weights_count).increment(1);
+				//context.getCounter(Test.weights_count).increment(1);
 				weight_sum += value.getWeight();
 			} else { // Resume the neuron structure.
 				neuron = value.getNeuronWritable();
 				adjlist = value.getAdjListWritable();
-				context.getCounter(Test.neuron_count).increment(1);
+				//context.getCounter(Test.neuron_count).increment(1);
 			}
 		}
 		

@@ -16,7 +16,7 @@ import org.apache.hadoop.util.ToolRunner;
 
 public class NeuronGraph extends Configured implements Tool {
 
-	public final static int TIME_IN_MS = 100;
+	public final static int TIME_IN_MS = 50;
 
 	@Override
 	public int run(String[] args) throws Exception {
@@ -53,7 +53,7 @@ public class NeuronGraph extends Configured implements Tool {
 			job.setReducerClass(NeuronGraphReducer.class);
 			job.setInputFormatClass(SequenceFileInputFormat.class);
 			job.setOutputFormatClass(SequenceFileOutputFormat.class);
-			job.setNumReduceTasks(12);
+			job.setNumReduceTasks(96);
 
 			job.setOutputKeyClass(IntWritable.class);
 			job.setOutputValueClass(MultiWritableWrapper.class);
