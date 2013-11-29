@@ -12,8 +12,8 @@ public class InputPartitioner extends Partitioner<IntWritable, MultiWritableWrap
 	 * Make sure that TotalNumOfNeurons can be divided by NumOfNeuronsPerPartition
 	 * to simplify the processing.
 	 */
-	public final static int TotalNumOfNeurons = 1000;
-	public final static int NumOfNeuronsPerPartition = 200;
+	public final static int TotalNumOfNeurons = 100000;
+	public final static int NumOfNeuronsPerPartition = 500;
 	
 	@Override
 	public int getPartition(IntWritable key, MultiWritableWrapper value, int numReduceTasks) {

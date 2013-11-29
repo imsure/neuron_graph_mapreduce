@@ -31,6 +31,8 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 				+ 140 - neuron.recovery + current);
 		neuron.potential += 0.5 * (0.04*neuron.potential*neuron.potential + 5*neuron.potential
 				+ 140 - neuron.recovery + current);
+		//neuron.potential += 0.04*neuron.potential*neuron.potential + 5*neuron.potential
+		//		+ 140 - neuron.recovery + current;
 		// Update membrane recovery variable.
 		neuron.recovery += neuron.param_a * (neuron.param_b*neuron.potential - neuron.recovery);
 
@@ -57,7 +59,7 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 		// Start Neuron Evolution
 		this.neuronEvolution(current, neuron);
 		//System.err.println(neuron.toString());
-
+		
 		// Check if the neuron has fired.
 		if (neuron.potential >= 30.0) { // fired
 			AdjListWritable adjlist_writable = value.getAdjListWritable();

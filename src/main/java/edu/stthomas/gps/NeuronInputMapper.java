@@ -8,6 +8,8 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
+import org.apache.hadoop.conf.Configuration;
+
 
 /**
  * The Mapper class will generate input data for a neuron network based on the metadata provided.
@@ -24,7 +26,11 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 	@Override
 	public void map(LongWritable key, Text value, Context context) 
 			throws IOException, InterruptedException {
-
+		
+		//Configuration conf = context.getConfiguration();
+		//float ex_prob = conf.getFloat("EXPROB", Excitatory_Prob);
+		//float in_prob = conf.getFloat("INPROB", Inhibitory_Prob);
+		
 		String[] fields = value.toString().split(",");
 		int start_id = Integer.parseInt(fields[0]);
 		int end_id = Integer.parseInt(fields[1]);
@@ -48,7 +54,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 					if (randn.nextFloat() < Excitatory_Prob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight((float)0.5*randn.nextFloat());
+						weight.setWeight((float)0.05*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}
@@ -57,7 +63,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 					if (randn.nextFloat() < Inhibitory_Prob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight(-1*randn.nextFloat());
+						weight.setWeight((float)-0.1*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}

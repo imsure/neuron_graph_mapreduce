@@ -23,7 +23,7 @@ public class NeuronGraphReducer extends Reducer<IntWritable, NeuronStateWritable
 	private boolean firstCalled;
 	
 	private enum Test {
-		weights_count, neuron_count, test,
+		neg_weights_count, neuron_count, test,
 	}
 	
 	/*
@@ -50,10 +50,22 @@ public class NeuronGraphReducer extends Reducer<IntWritable, NeuronStateWritable
 		String uri;
 		if (iteration_num.equals("1")) { 
 			// First iteration, input to the job is "neuron_graph_input"
-			uri = "neuron_graph_input_1000" + "/" + "part-r-0000" + reducer_num;
+			if (reducer_num < 10) {
+				uri = "neuron_graph_input_100000" + "/" + "part-r-0000" + reducer_num;
+			} else if (reducer_num < 100) {
+				uri = "neuron_graph_input_100000" + "/" + "part-r-000" + reducer_num;
+			} else {
+				uri = "neuron_graph_input_100000" + "/" + "part-r-00" + reducer_num;
+			}
 		} else {
 			// After the first iteration, input for the job is the output of the previous job.
-			uri = "neuron_graph_output" + (Integer.parseInt(iteration_num)-1) + "/" + "part-r-0000" + reducer_num;
+			if (reducer_num < 10) {
+				uri = "neuron_graph_output" + (Integer.parseInt(iteration_num)-1) + "/" + "part-r-0000" + reducer_num;
+			} else if (reducer_num < 100) { 
+				uri = "neuron_graph_output" + (Integer.parseInt(iteration_num)-1) + "/" + "part-r-000" + reducer_num;
+			} else {
+				uri = "neuron_graph_output" + (Integer.parseInt(iteration_num)-1) + "/" + "part-r-00" + reducer_num;
+			}
 		}
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(URI.create(uri), conf);
@@ -83,21 +95,25 @@ public class NeuronGraphReducer extends Reducer<IntWritable, NeuronStateWritable
 			if (key.equals(graphPartitonKey)) {
 				break;
 			} else {
-				context.getCounter(Test.test).increment(1);
+				//context.getCounter(Test.test).increment(1);
 				context.write(graphPartitonKey, graphPartitonValue);
 			}
 		}
 		
 		for (NeuronStateWritable value : values) {
 			if (!isNeuron(value)) {
-				context.getCounter(Test.weights_count).increment(1);
-				weight_sum += value.getWeight();
+				//context.getCounter(Test.weights_count).increment(1);
+				float weight = value.getWeight();
+				//if (weight < 0) {
+				//	context.getCounter(Test.neg_weights_count).increment(1);
+				//}
+				weight_sum += weight;
 			} else { // Recover the neuron structure.
 				graphPartitonValue.getNeuronWritable().fired = value.getNeuron().fired;
 				graphPartitonValue.getNeuronWritable().potential = value.getNeuron().potential;
 				graphPartitonValue.getNeuronWritable().recovery = value.getNeuron().recovery;
 				graphPartitonValue.getNeuronWritable().time = value.getNeuron().time;
-				context.getCounter(Test.neuron_count).increment(1);
+				//context.getCounter(Test.neuron_count).increment(1);
 			}
 		}
 		
