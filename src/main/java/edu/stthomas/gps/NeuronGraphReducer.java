@@ -51,9 +51,9 @@ public class NeuronGraphReducer extends Reducer<IntWritable, MultiWritableWrappe
 		multi_writable.setNeuronWritable(neuron);
 		multi_writable.setAdjListWritable(adjlist);
 		
-		if (multi_writable.getWritableType() == MultiWritableWrapper.Synaptic_Weight) {
-			context.getCounter(Test.test).increment(1);
-		}
+		//if (multi_writable.getWritableType() == MultiWritableWrapper.Synaptic_Weight) {
+		//	context.getCounter(Test.test).increment(1);
+		//}
 		
 		context.write(key, multi_writable);
 	}

@@ -34,7 +34,7 @@ public class NeuronGraph extends Configured implements Tool {
 		String OUT = args[1] + timer;
 
 		// Chaining the jobs together
-		while (timer <= TIME_IN_MS) {
+		while (timer <= getConf().getInt("time", TIME_IN_MS)) {
 
 			Job job = new Job(getConf());
 

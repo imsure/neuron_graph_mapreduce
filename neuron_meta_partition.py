@@ -6,7 +6,7 @@ The meta data files serve as input for a MapReduce (mapper-only) program
 to generate the actual input data which is a graph representation
 of the neuron network for the project. Each meta data file corresponds to
 a MapReduce output. E.g, neuron_meta0.txt --> part-m-00000
-                         neuron_meta299.txt --> part-m-00299
+neuron_meta299.txt --> part-m-00299
 
 The meta data file is text file with a single line:
 start neuron id, end neuron id, total number of neurons, type of neurons
@@ -24,10 +24,10 @@ import shutil
 Total = 100000 # The total number of neurons
 TypeE = 'e' # Excititory
 TypeI = 'i' # Inhibitory
-NumE = 80000
-NumI = 20000
-NumEPerFile = 200
-NumIPerFile = 200
+NumE = 70000
+NumI = 30000
+NumEPerFile = 500
+NumIPerFile = 500
 FileNamePrefix = 'neuron_meta'
 InputDir = 'neuron_meta'
 
@@ -45,7 +45,7 @@ def partition(start, neuron_type, total_by_type, NumPerFile):
 
     n = 0
     while n < num_partition:
-        start_id = start + n * NumPerFile
+        start_id = start + n * NumPerFile + 1
         end_id = start + (n+1) * NumPerFile
 
         file_name = FileNamePrefix + str(n) + neuron_type + '.txt'
@@ -59,5 +59,5 @@ if __name__ == '__main__':
         shutil.rmtree(InputDir)
 
     os.mkdir(InputDir)
-    partition(1, TypeE, NumE, NumEPerFile)
-    partition(NumE+1, TypeI, NumI, NumIPerFile)
+    partition(0, TypeE, NumE, NumEPerFile)
+    partition(NumE, TypeI, NumI, NumIPerFile)
