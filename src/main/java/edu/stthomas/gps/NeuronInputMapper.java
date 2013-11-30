@@ -54,7 +54,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 					if (randn.nextFloat() < Excitatory_Prob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight((float)0.05*randn.nextFloat());
+						weight.setWeight((float)0.3*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}
@@ -63,7 +63,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 					if (randn.nextFloat() < Inhibitory_Prob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight((float)-0.1*randn.nextFloat());
+						weight.setWeight((float)-0.5*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}
