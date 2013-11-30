@@ -40,7 +40,7 @@ public class NeuronGraph extends Configured implements Tool {
 			Job job = new Job(getConf());
 
 			job.setJarByClass(this.getClass());
-			job.setJobName("Neuron Graph Schimmy:" + timer);
+			job.setJobName("Neuron Graph Mapper-side Schimmy:" + timer);
 
 			FileInputFormat.addInputPath(job, new Path(IN));
 			FileOutputFormat.setOutputPath(job, new Path(OUT));
@@ -65,7 +65,7 @@ public class NeuronGraph extends Configured implements Tool {
 			
 			job.setOutputKeyClass(IntWritable.class);
 			//job.setOutputValueClass(NeuronWritable.class);
-			job.setOutputValueClass(MultiWritableWrapper.class);
+			job.setOutputValueClass(NeuronWritable.class);
 
 			success = job.waitForCompletion(true);
 			if (success == false) {

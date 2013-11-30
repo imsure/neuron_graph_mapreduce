@@ -22,14 +22,16 @@ public class NeuronInput extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		
-		if (args.length != 2) {
-			System.err.printf("Usage: %s [generic options] <input> <output>\n", getClass().getSimpleName());
+		if (args.length != 3) {
+			System.err.printf("Usage: %s [generic options] <input> <neuron output> <adjacency list output>\n", 
+					getClass().getSimpleName());
 			ToolRunner.printGenericCommandUsage(System.err);
 			System.exit(-1);
 		}
 		
 		String input = args[0];
-		String output = args[1];
+		String neuron_output = args[1];
+		String adjlist_output = args[2];
 		
 		Job job = new Job(getConf());
 		
@@ -37,7 +39,7 @@ public class NeuronInput extends Configured implements Tool {
 		job.setJobName("Neuron Graph Generation");
 		
 		FileInputFormat.addInputPath(job, new Path(input));
-		FileOutputFormat.setOutputPath(job, new Path(output));
+		FileOutputFormat.setOutputPath(job, new Path(neuron_output));
 		
 		FileOutputFormat.setCompressOutput(job, true);
 		FileOutputFormat.setOutputCompressorClass(job, SnappyCodec.class);
@@ -55,9 +57,40 @@ public class NeuronInput extends Configured implements Tool {
 				/ InputPartitioner.NumOfNeuronsPerPartition);
 		
 		job.setOutputKeyClass(IntWritable.class);
-		job.setOutputValueClass(MultiWritableWrapper.class);
+		job.setOutputValueClass(NeuronWritable.class);
 		
-		return job.waitForCompletion(true) ? 0 : -1;
+		boolean success = job.waitForCompletion(true);
+		if (success == true) {
+			Job job2 = new Job(getConf());
+			
+			job2.setJarByClass(this.getClass());
+			job2.setJobName("Adjacency List Generation");
+			
+			FileInputFormat.addInputPath(job2, new Path(input));
+			FileOutputFormat.setOutputPath(job2, new Path(adjlist_output));
+			
+			FileOutputFormat.setCompressOutput(job2, true);
+			FileOutputFormat.setOutputCompressorClass(job2, SnappyCodec.class);
+			
+			SequenceFileOutputFormat.setOutputCompressionType(job2, CompressionType.BLOCK);
+			
+			job2.setMapperClass(AdjListMapper.class);
+			job2.setReducerClass(AdjListReducer.class);
+			job2.setPartitionerClass(AdjListPartitioner.class);
+			
+			job2.setOutputFormatClass(SequenceFileOutputFormat.class);
+			
+			// Range paritioner decides how many reducers we need.
+			job2.setNumReduceTasks(AdjListPartitioner.TotalNumOfNeurons 
+					/ AdjListPartitioner.NumOfNeuronsPerPartition);
+			
+			job2.setOutputKeyClass(IntWritable.class);
+			job2.setOutputValueClass(AdjListWritable.class);
+			
+			success = job2.waitForCompletion(true);
+		}		
+		
+		return success ? 0 : -1;
 	}
 	
 	public static void main(String[] args) throws Exception {

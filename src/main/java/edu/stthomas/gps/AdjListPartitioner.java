@@ -6,7 +6,7 @@ import org.apache.hadoop.io.IntWritable;
 /*
  * A simple range partitioner based on the neuron id which is an interger.
  */
-public class InputPartitioner extends Partitioner<IntWritable, NeuronWritable> {
+public class AdjListPartitioner extends Partitioner<IntWritable, AdjListWritable> {
 	
 	/*
 	 * Make sure that TotalNumOfNeurons can be divided by NumOfNeuronsPerPartition
@@ -16,7 +16,7 @@ public class InputPartitioner extends Partitioner<IntWritable, NeuronWritable> {
 	public final static int NumOfNeuronsPerPartition = 500;
 	
 	@Override
-	public int getPartition(IntWritable key, NeuronWritable value, int numReduceTasks) {
+	public int getPartition(IntWritable key, AdjListWritable value, int numReduceTasks) {
 		/*
 		 * The goal is to put neuron 1 to 200 to the reducer 0,
 		 * neuron 201 to 400 to reducer 1, and so on.

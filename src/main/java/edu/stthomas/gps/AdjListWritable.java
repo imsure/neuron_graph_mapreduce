@@ -49,8 +49,12 @@ public class AdjListWritable extends ArrayWritable {
         //    sb.append(s).append(" ");
         //}
 		
+		int n = 0;
 		for (SynapticWeightWritable weight : adjlist) {
-			sb.append(weight.toString()).append(' ');
+			if (n < 100) {
+				sb.append(weight.toString()).append(' ');
+			}
+			n++;
 		}
         sb.append("size of ajacency list:").append(adjlist.size());
         return sb.toString();

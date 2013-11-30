@@ -7,17 +7,17 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 
-public class NeuronInputReducer 
-extends Reducer<IntWritable, NeuronWritable, IntWritable, NeuronWritable> {
+public class AdjListReducer 
+extends Reducer<IntWritable, AdjListWritable, IntWritable, AdjListWritable> {
 
 	@Override
-	public void reduce(IntWritable key, Iterable<NeuronWritable> values, Context context) 
+	public void reduce(IntWritable key, Iterable<AdjListWritable> values, Context context) 
 			throws IOException, InterruptedException {
 		
 		/*
 		 * Simply emit key, value pairs.
 		 */
-		for (NeuronWritable value : values) {
+		for (AdjListWritable value : values) {
 			context.write(key, value);
 		}
 	}

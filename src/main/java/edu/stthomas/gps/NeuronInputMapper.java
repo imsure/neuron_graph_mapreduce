@@ -15,13 +15,10 @@ import org.apache.hadoop.conf.Configuration;
  * The Mapper class will generate input data for a neuron network based on the metadata provided.
  *
  */
-public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, MultiWritableWrapper>
+public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, NeuronWritable>
 {
 	private IntWritable neuron_id = new IntWritable();
-	private MultiWritableWrapper multi_writable = new MultiWritableWrapper();
 	private Random randn = new Random();
-	public static final float Excitatory_Prob = (float) 0.4;
-	public static final float Inhibitory_Prob = (float) 0.6;
 
 	@Override
 	public void map(LongWritable key, Text value, Context context) 
@@ -43,41 +40,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 		for (int i = start_id; i <= end_id; i++) {
 			neuron_id.set(i);
 			NeuronWritable neuron = generateKey(type);
-			ArrayList<SynapticWeightWritable> adjlist = new ArrayList<SynapticWeightWritable>();
-
-			/*
-			 * Go through outgoing nodes, create edges from neuron 'i' to neuron 'j', that is,
-			 * synaptic weights that neuron 'i' have to neuron 'j'.
-			 */
-			if (type == 'e') {
-				for (int j = 1; j <= total; j++) {
-					if (randn.nextFloat() < Excitatory_Prob) {
-						SynapticWeightWritable weight = new SynapticWeightWritable();
-						weight.setID(j);
-						weight.setWeight((float)0.05*randn.nextFloat());
-						adjlist.add(weight);
-					}
-				}
-			} else {
-				for (int j = 1; j <= total; j++) {
-					if (randn.nextFloat() < Inhibitory_Prob) {
-						SynapticWeightWritable weight = new SynapticWeightWritable();
-						weight.setID(j);
-						weight.setWeight((float)-0.1*randn.nextFloat());
-						adjlist.add(weight);
-					}
-				}
-			}
-			
-			multi_writable.setNeuronWritable(neuron);
-			multi_writable.setAdjListWritable(AdjListWritable.fromArrayList(adjlist));
-			
-			// The following commented code is just to test if writing null to writable is ok. It is fine actually.
-			//multi_writable.setWritableType(MultiWritableWrapper.Synaptic_Weight);
-			//multi_writable.setNeuronWritable(null);
-			//multi_writable.setAdjListWritable(null);
-			
-			context.write(neuron_id, multi_writable);
+			context.write(neuron_id, neuron);
 		}
 	}
 
