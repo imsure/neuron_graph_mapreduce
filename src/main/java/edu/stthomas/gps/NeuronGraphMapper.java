@@ -23,7 +23,7 @@ public class NeuronGraphMapper extends Mapper<IntWritable, NeuronWritable, IntWr
 	private AdjListWritable adjlist_writable = new AdjListWritable();
 	private Random randn = new Random();
 	private boolean firstCalled;
-	private SequenceFile.Reader reader;
+	private SequenceFile.Reader reader = null;
 
 	private enum Firing {
 		Count,
@@ -149,6 +149,8 @@ public class NeuronGraphMapper extends Mapper<IntWritable, NeuronWritable, IntWr
 	@Override
 	public void cleanup(Context context) 
 			throws IOException, InterruptedException {
-		reader.close();
+		if (reader != null) {
+			reader.close();
+		}
 	}
 }
