@@ -2,8 +2,7 @@ package edu.stthomas.gps;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -24,6 +23,7 @@ public class NeuronGraphMapper extends Mapper<IntWritable, NeuronWritable, IntWr
 	private Random randn = new Random();
 	private boolean firstCalled;
 	private SequenceFile.Reader reader = null;
+	private Map<Integer, Float> weight_map; // For in-mapper combiner
 
 	private enum Firing {
 		Count,
@@ -32,6 +32,8 @@ public class NeuronGraphMapper extends Mapper<IntWritable, NeuronWritable, IntWr
 	@Override
 	public void setup(Context context) 
 			throws IOException, InterruptedException {
+		// Set up Hash Map for in mapper combiner.
+		this.weight_map = new HashMap<Integer, Float>();
 		firstCalled = false;
 	}
 
@@ -117,19 +119,22 @@ public class NeuronGraphMapper extends Mapper<IntWritable, NeuronWritable, IntWr
 					break;
 				}
 			}
-			
+
 			//System.err.println(value.getWritableType() + "\t" + value.getWeight() + value.getNeuronWritable().toString());
 			ArrayList<SynapticWeightWritable> adjlist = adjlist_writable.toArrayList();
 
 			// Emit synaptic weights by iterating the adjacency list.
 			for (SynapticWeightWritable weight : adjlist) {
-				neuron_state.setTypeOfValue('W');
-				neuron_state.setWeight(weight.getWeight());
-				neuron_state.setNeuron(null); // set to null to save space.
 
-				neuron_id.set(weight.getID());
+				int id = weight.getID();
 
-				context.write(neuron_id, neuron_state);
+				Float accumulated_weight = this.weight_map.get(id);
+				float current_weight = weight.getWeight();
+				if (accumulated_weight == null) {
+					this.weight_map.put(id, current_weight);
+				} else {
+					this.weight_map.put(id, accumulated_weight+current_weight);
+				}
 			}
 
 			// Reset the membrane potential (voltage) and membrane recovery variable after firing.
@@ -145,12 +150,22 @@ public class NeuronGraphMapper extends Mapper<IntWritable, NeuronWritable, IntWr
 		// Emit the neuron structure.
 		context.write(key, neuron_state);
 	}
-	
+
 	@Override
 	public void cleanup(Context context) 
 			throws IOException, InterruptedException {
 		if (reader != null) {
 			reader.close();
+		}
+		
+		for (Map.Entry<Integer, Float> entry : this.weight_map.entrySet()) {
+			neuron_state.setTypeOfValue('W');
+			neuron_state.setWeight(entry.getValue());
+			neuron_state.setNeuron(null); // set to null to save space.
+
+			neuron_id.set(entry.getKey());
+
+			context.write(neuron_id, neuron_state);
 		}
 	}
 }
