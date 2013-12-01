@@ -9,17 +9,16 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
 public class FiringExtractionMapper 
-extends Mapper<IntWritable, MultiWritableWrapper, IntWritable, IntWritable>{
+extends Mapper<IntWritable, NeuronWritable, IntWritable, IntWritable>{
 
 	private IntWritable firing_time = new IntWritable();
 	
 	@Override
-	public void map(IntWritable key, MultiWritableWrapper value, Context context) 
+	public void map(IntWritable key, NeuronWritable value, Context context) 
 			throws IOException, InterruptedException {
 		
-		NeuronWritable neuron = value.getNeuronWritable();
-		if (neuron.fired == 'Y') {
-			firing_time.set(neuron.time);
+		if (value.fired == 'Y') {
+			firing_time.set(value.time);
 			context.write(key, firing_time);
 		}
 	}
