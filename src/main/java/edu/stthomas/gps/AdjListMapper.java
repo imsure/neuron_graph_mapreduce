@@ -19,7 +19,7 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 	private IntWritable neuron_id = new IntWritable();
 
 	public static final float Excitatory_Prob = (float) 0.2;
-	public static final float Inhibitory_Prob = (float) 0.4;
+	public static final float Inhibitory_Prob = (float) 0.3;
 	
 	@Override
 	public void map(LongWritable key, Text value, Context context) 

@@ -69,12 +69,12 @@ public class NeuronGraphMapper extends Mapper<IntWritable, NeuronWritable, IntWr
 	private void neuronEvolution(float current, NeuronWritable neuron) {
 		current += neuron.synaptic_sum;
 		// Update the membrane potential. Step 0.5 ms for numerical stability. 
-		//neuron.potential += 0.5 * (0.04*neuron.potential*neuron.potential + 5*neuron.potential
-		//		+ 140 - neuron.recovery + current);
-		//neuron.potential += 0.5 * (0.04*neuron.potential*neuron.potential + 5*neuron.potential
-		//		+ 140 - neuron.recovery + current);
-		neuron.potential += 0.04*neuron.potential*neuron.potential + 5*neuron.potential
-				+ 140 - neuron.recovery + current;
+		neuron.potential += 0.5 * (0.04*neuron.potential*neuron.potential + 5*neuron.potential
+				+ 140 - neuron.recovery + current);
+		neuron.potential += 0.5 * (0.04*neuron.potential*neuron.potential + 5*neuron.potential
+				+ 140 - neuron.recovery + current);
+		//neuron.potential += 0.04*neuron.potential*neuron.potential + 5*neuron.potential
+		//		+ 140 - neuron.recovery + current;
 		// Update membrane recovery variable.
 		neuron.recovery += neuron.param_a * (neuron.param_b*neuron.potential - neuron.recovery);
 
