@@ -18,8 +18,8 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 	private Random randn = new Random();
 	private IntWritable neuron_id = new IntWritable();
 
-	public static final float Excitatory_Prob = (float) 0.4;
-	public static final float Inhibitory_Prob = (float) 0.6;
+	public static final float Excitatory_Prob = (float) 0.2;
+	public static final float Inhibitory_Prob = (float) 0.4;
 	
 	@Override
 	public void map(LongWritable key, Text value, Context context) 
@@ -54,7 +54,7 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 					if (randn.nextFloat() < Inhibitory_Prob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight((float)-0.5*randn.nextFloat());
+						weight.setWeight((float)-0.3*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}
