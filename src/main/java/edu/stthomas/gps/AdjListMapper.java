@@ -45,7 +45,7 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 					if (randn.nextFloat() < Excitatory_Prob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight((float)0.2*randn.nextFloat());
+						weight.setWeight((float)0.25*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}
