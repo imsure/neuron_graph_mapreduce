@@ -18,6 +18,7 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 	private IntWritable neuron_id = new IntWritable();
 	private MultiWritableWrapper multi_writable = new MultiWritableWrapper();
 	private Random randn = new Random();
+
 	public static final float Excitatory_Prob = (float) 0.2;
 	public static final float Inhibitory_Prob = (float) 0.3;
 
@@ -62,17 +63,17 @@ public class NeuronInputMapper extends Mapper<LongWritable, Text, IntWritable, M
 					}
 				}
 			}
-			
+
 			multi_writable.setWritableType(MultiWritableWrapper.NeuronObj);
 			multi_writable.setWeight(999); // just an arbitrary number, as a place holder
 			multi_writable.setNeuronWritable(neuron);
 			multi_writable.setAdjListWritable(AdjListWritable.fromArrayList(adjlist));
-			
+
 			// The following commented code is just to test if writing null to writable is ok. It is fine actually.
 			//multi_writable.setWritableType(MultiWritableWrapper.Synaptic_Weight);
 			//multi_writable.setNeuronWritable(null);
 			//multi_writable.setAdjListWritable(null);
-			
+
 			context.write(neuron_id, multi_writable);
 		}
 	}

@@ -2,6 +2,8 @@ package edu.stthomas.gps;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.hadoop.io.IntWritable;
@@ -15,11 +17,20 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 	private IntWritable neuron_id = new IntWritable(); // key
 	private MultiWritableWrapper multi_writable = new MultiWritableWrapper(); // value
 	private Random randn = new Random();
+	private Map<Integer, Float> weight_map; // For in-mapper combiner
+
 
 	private enum Firing {
 		Count,
 	}
-	
+
+	@Override
+	public void setup(Context context)
+			throws IOException, InterruptedException {
+		// Set up Hash Map for in mapper combiner.
+		this.weight_map = new HashMap<Integer, Float>();
+	}
+
 	private double getGaussian() {
 		return randn.nextGaussian();
 	}
@@ -63,33 +74,51 @@ public class NeuronGraphMapper extends Mapper<IntWritable, MultiWritableWrapper,
 			System.err.println(value.getWritableType() + "\t" + value.getWeight() + value.getNeuronWritable().toString());
 			ArrayList<SynapticWeightWritable> adjlist = adjlist_writable.toArrayList();
 
-			// Emit synaptic weights by iterating the adjacency list. 
+			// Emit synaptic weights by iterating the adjacency list.
 			for (SynapticWeightWritable weight : adjlist) {
-				multi_writable.setWritableType(MultiWritableWrapper.Synaptic_Weight);
-				multi_writable.setWeight(weight.getWeight());
-				multi_writable.setNeuronWritable(null);
-				multi_writable.setAdjListWritable(null);
 
-				neuron_id.set(weight.getID());
+				int id = weight.getID();
 
-				context.write(neuron_id, multi_writable);
+				Float accumulated_weight = this.weight_map.get(id);
+				float current_weight = weight.getWeight();
+				if (accumulated_weight == null) {
+					this.weight_map.put(id, current_weight);
+				} else {
+					this.weight_map.put(id, accumulated_weight+current_weight);
+				}
 			}
 
 			// Reset the membrane potential (voltage) and membrane recovery variable after firing.
 			neuron.potential = neuron.param_c;
 			neuron.recovery += neuron.param_d;
 			neuron.fired = 'Y'; // Indicate the neuron fired at this iteration.
-			
+
 			context.getCounter(Firing.Count).increment(1);
 		}
-		
+
 		// Update the multiple writable with the updated neuron object after evolution. 
 		// Other fileds in the multiple writable remained the same.
 		value.setNeuronWritable(neuron);
-	
+
 		//value.setWritableType(MultiWritableWrapper.NeuronObj);
-		
+
 		// Emit the whole neuron structure.
 		context.write(key, value);
+	}
+
+	@Override
+	public void cleanup(Context context)
+			throws IOException, InterruptedException {
+
+		for (Map.Entry<Integer, Float> entry : this.weight_map.entrySet()) {
+			multi_writable.setWritableType(MultiWritableWrapper.Synaptic_Weight);
+			multi_writable.setWeight(entry.getValue());
+			multi_writable.setNeuronWritable(null);
+			multi_writable.setAdjListWritable(null);
+
+			neuron_id.set(entry.getKey());
+
+			context.write(neuron_id, multi_writable);
+		}
 	}
 }

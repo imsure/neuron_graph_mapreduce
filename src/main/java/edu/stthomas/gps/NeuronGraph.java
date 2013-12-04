@@ -39,7 +39,7 @@ public class NeuronGraph extends Configured implements Tool {
 			Job job = new Job(getConf());
 
 			job.setJarByClass(this.getClass());
-			job.setJobName("Neuron Graph Processing:" + timer + "ms");
+			job.setJobName("Neuron Graph Processing-IMC:" + timer + "ms");
 
 			FileInputFormat.addInputPath(job, new Path(IN));
 			FileOutputFormat.setOutputPath(job, new Path(OUT));
