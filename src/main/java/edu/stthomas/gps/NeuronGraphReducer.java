@@ -14,7 +14,16 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.conf.Configuration;
 
-
+/**
+ * Input key: neuron id
+ * Input value: neuron's internal state
+ * 
+ * Output key: neuron id
+ * Output value: neuron's internal state with synaptic weight updated
+ * 
+ * @author imsure
+ *
+ */
 public class NeuronGraphReducer extends Reducer<IntWritable, NeuronStateWritable, IntWritable, NeuronWritable> {
 	
 	private NeuronWritable neuron = new NeuronWritable();
