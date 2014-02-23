@@ -59,7 +59,23 @@ public class NeuronWritable implements Writable {
 		sb.append(recovery).append(',');
 		sb.append(potential).append(',');
 		sb.append(synaptic_sum).append(',');
-		sb.append(fired).append(',');
+		sb.append(fired);
+		
+		return sb.toString();
+	}
+	
+	/**
+	 * Exclude 'time', 'param_a, b, d
+	 * 
+	 * @return
+	 */
+	public String toString2() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(type).append('\t');
+		sb.append(recovery).append('\t');
+		sb.append(potential).append('\t');
+		sb.append(synaptic_sum).append('\t');
+		sb.append(fired);
 		
 		return sb.toString();
 	}
