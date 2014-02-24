@@ -21,6 +21,9 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 	public static final float Excitatory_Prob = (float) 0.2;
 	public static final float Inhibitory_Prob = (float) 0.3;
 	
+	public static final float EWeight = (float) 0.25;
+	public static final float IWeight = (float) -0.3;
+	
 	@Override
 	public void map(LongWritable key, Text value, Context context) 
 			throws IOException, InterruptedException {
@@ -30,6 +33,12 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 		int end_id = Integer.parseInt(fields[1]);
 		int total = Integer.parseInt(fields[2]);
 		char type = fields[3].charAt(0);
+		
+		float eprob = context.getConfiguration().getFloat("EPROB", Excitatory_Prob);
+		float iprob = context.getConfiguration().getFloat("IPROB", Inhibitory_Prob);
+		
+		float eweight = context.getConfiguration().getFloat("EW", EWeight);
+		float iweight = context.getConfiguration().getFloat("IW", IWeight);
 		
 		for (int i = start_id; i <= end_id; i++) {
 			neuron_id.set(i);
@@ -42,19 +51,19 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 			 */
 			if (type == 'e') {
 				for (int j = 1; j <= total; j++) {
-					if (randn.nextFloat() < Excitatory_Prob) {
+					if (randn.nextFloat() < eprob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight((float)0.25*randn.nextFloat());
+						weight.setWeight((float)eweight*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}
 			} else {
 				for (int j = 1; j <= total; j++) {
-					if (randn.nextFloat() < Inhibitory_Prob) {
+					if (randn.nextFloat() < iprob) {
 						SynapticWeightWritable weight = new SynapticWeightWritable();
 						weight.setID(j);
-						weight.setWeight((float)-0.3*randn.nextFloat());
+						weight.setWeight((float)iweight*randn.nextFloat());
 						adjlist.add(weight);
 					}
 				}

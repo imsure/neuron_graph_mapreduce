@@ -57,8 +57,8 @@ public class NeuronGraph extends Configured implements Tool {
 			job.setInputFormatClass(SequenceFileInputFormat.class);
 			job.setOutputFormatClass(SequenceFileOutputFormat.class);
 			//job.setNumReduceTasks(0);
-			job.setNumReduceTasks(NeuronIDRangePartitioner.TotalNumOfNeurons /
-					NeuronIDRangePartitioner.NumOfNeuronsPerPartition);
+			job.setNumReduceTasks(NeuronInput.TotalNumOfNeurons /
+					NeuronInput.NumOfNeuronsPerPartition);
 
 			job.setMapOutputKeyClass(IntWritable.class);
 			job.setMapOutputValueClass(NeuronStateWritable.class);

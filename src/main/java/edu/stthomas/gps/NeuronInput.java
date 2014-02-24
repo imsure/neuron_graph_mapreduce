@@ -19,6 +19,9 @@ import org.apache.hadoop.fs.Path;
 
 public class NeuronInput extends Configured implements Tool {
 
+	public static int TotalNumOfNeurons = 1000;
+	public static int NumOfNeuronsPerPartition = 500;
+	
 	@Override
 	public int run(String[] args) throws Exception {
 		
@@ -28,6 +31,13 @@ public class NeuronInput extends Configured implements Tool {
 			ToolRunner.printGenericCommandUsage(System.err);
 			System.exit(-1);
 		}
+		
+		/*
+		 * Make sure that TotalNumOfNeurons can be divided by NumOfNeuronsPerPartition
+		 * to simplify the processing.
+		 */
+		//TotalNumOfNeurons = getConf().getInt("NumNeuron", 100000);
+		//NumOfNeuronsPerPartition = getConf().getInt("NumPart", 100);
 		
 		String input = args[0];
 		String neuron_output = args[1];
@@ -53,8 +63,8 @@ public class NeuronInput extends Configured implements Tool {
 		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 		
 		// Range paritioner decides how many reducers we need.
-		job.setNumReduceTasks(InputPartitioner.TotalNumOfNeurons 
-				/ InputPartitioner.NumOfNeuronsPerPartition);
+		job.setNumReduceTasks(TotalNumOfNeurons 
+				/ NumOfNeuronsPerPartition);
 		
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(NeuronWritable.class);
@@ -81,8 +91,7 @@ public class NeuronInput extends Configured implements Tool {
 			job2.setOutputFormatClass(SequenceFileOutputFormat.class);
 			
 			// Range paritioner decides how many reducers we need.
-			job2.setNumReduceTasks(AdjListPartitioner.TotalNumOfNeurons 
-					/ AdjListPartitioner.NumOfNeuronsPerPartition);
+			job2.setNumReduceTasks(TotalNumOfNeurons / NumOfNeuronsPerPartition);
 			
 			job2.setOutputKeyClass(IntWritable.class);
 			job2.setOutputValueClass(AdjListWritable.class);
