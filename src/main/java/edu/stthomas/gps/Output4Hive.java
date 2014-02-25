@@ -33,8 +33,8 @@ public class Output4Hive extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 
-		if (args.length != 2) {
-			System.err.printf("Usage: %s [generic options] <input> <output>\n", 
+		if (args.length != 1) {
+			System.err.printf("Usage: %s [generic options] <output>\n", 
 					getClass().getSimpleName());
 			ToolRunner.printGenericCommandUsage(System.err);
 			System.exit(-1);
@@ -44,13 +44,19 @@ public class Output4Hive extends Configured implements Tool {
 		 * Start jobs for post-analysis
 		 */
 		String inpaths = new String(); // used to construct a comma separated input paths.
-
+		int sim_time = getConf().getInt("time", NeuronGraph.TIME_IN_MS);
+		
+		for (int i = 1; i < sim_time; i++) {
+			inpaths += "neuron_graph_output" + i + ",";
+		}
+		inpaths += "neuron_graph_output" + sim_time;
+		
 		Job job = new Job(getConf());
 		job.setJarByClass(this.getClass());
 		job.setJobName("Output 4 Hive");
 
-		FileInputFormat.addInputPath(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		FileInputFormat.addInputPaths(job, inpaths);
+		FileOutputFormat.setOutputPath(job, new Path(args[0]));
 
 		job.setMapperClass(Output4HiveMapper.class);
 		job.setInputFormatClass(SequenceFileInputFormat.class);
