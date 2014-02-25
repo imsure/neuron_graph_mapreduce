@@ -43,7 +43,7 @@ extends Mapper<IntWritable, NeuronWritable, NullWritable, Text> {
 		int time = value.time;
 		//String basepath = String.format("id=%s/time=%/part", neuron_id, time);
 		String path = new String();
-		path = "id=" + neuron_id + "/time=" + time + "/";
+		path = "id=" + neuron_id + "/time=" + time + "/neuron";
 		data.set(value.toString2());
 		multipleOutputs.write(NullWritable.get(), data, path);
 	}

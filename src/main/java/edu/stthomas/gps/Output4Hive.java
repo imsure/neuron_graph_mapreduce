@@ -11,11 +11,13 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
 
 /**
  * The driver for re-organizing outputs from each iteration of
@@ -52,6 +54,8 @@ public class Output4Hive extends Configured implements Tool {
 
 		job.setMapperClass(Output4HiveMapper.class);
 		job.setInputFormatClass(SequenceFileInputFormat.class);
+		
+		LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
 		
 		MultipleOutputs.addNamedOutput(job, "neuron", TextOutputFormat.class, 
 				IntWritable.class, Text.class);
