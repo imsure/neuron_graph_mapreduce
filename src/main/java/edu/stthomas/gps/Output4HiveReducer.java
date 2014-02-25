@@ -26,7 +26,7 @@ import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
  * @author imsure
  *
  */
-public class NeuronHiveReducer 
+public class Output4HiveReducer 
 extends Reducer<IntWritable, NeuronHiveWritable, NullWritable, Text> {
 
 	private MultipleOutputs<NullWritable, Text> multipleOutputs;
