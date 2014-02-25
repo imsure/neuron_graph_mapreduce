@@ -51,8 +51,8 @@ public class AdjListWritable extends ArrayWritable {
 		
 		int n = 0;
 		for (SynapticWeightWritable weight : adjlist) {
-			if (n < 100) {
-				sb.append(weight.toString()).append(' ');
+			if (n < 10 || (adjlist.size()-n) < 10) { // just show the first 10 and last 10 elements
+				sb.append(weight.toString()).append(' '); 
 			}
 			n++;
 		}
