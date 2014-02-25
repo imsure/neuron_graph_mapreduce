@@ -18,40 +18,31 @@ import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
  * Input key: neuron id
  * Input value: neuron's internal state
  * 
- * Output key: null (because we will store the neuron id as the name of directory.
- * Output value: text with data associated with a neuron at a given time
+ * Output key: neuron id
+ * Output value: NeuronHiveWritable
  * 
  * @author imsure
  *
  */
 public class Output4HiveMapper 
-extends Mapper<IntWritable, NeuronWritable, NullWritable, Text> {
+extends Mapper<IntWritable, NeuronWritable, IntWritable, NeuronHiveWritable> {
 
-	private MultipleOutputs<NullWritable, Text> multipleOutputs;
-	private NeuronWritable neuron = new NeuronWritable();
-	private Text data = new Text();
-		
-	@Override
-	public void setup(Context context) {
-		multipleOutputs = new MultipleOutputs<NullWritable, Text>(context);
-	}
+	private NeuronHiveWritable neuron = new NeuronHiveWritable();
+	private IntWritable time = new IntWritable();
 	
 	@Override
 	public void map(IntWritable key, NeuronWritable value, Context context) 
 			throws IOException, InterruptedException {
-		int neuron_id = key.get();
-		int time = value.time;
-		//String basepath = String.format("id=%s/time=%/part", neuron_id, time);
-		String path = new String();
-		path = "id=" + neuron_id + "/time=" + time + "/neuron";
-		data.set(value.toString2());
-		multipleOutputs.write(NullWritable.get(), data, path);
-	}
 	
-	@Override
-	public void cleanup(Context context) throws IOException, InterruptedException {
-		multipleOutputs.close();
+		time.set(value.time); // set time as key
+
+		neuron.id = key.get();
+		neuron.type = value.type;
+		neuron.potential = value.potential;
+		neuron.recovery = value.recovery;
+		neuron.fired = value.fired;
+		neuron.synaptic_sum = value.synaptic_sum;
+		
+		context.write(time, neuron);
 	}
 }
-
-
