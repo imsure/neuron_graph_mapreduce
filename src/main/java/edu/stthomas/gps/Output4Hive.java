@@ -4,6 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.compress.SnappyCodec;
@@ -29,7 +30,7 @@ import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
  *
  */
 public class Output4Hive extends Configured implements Tool {
-
+	
 	@Override
 	public int run(String[] args) throws Exception {
 
@@ -70,11 +71,12 @@ public class Output4Hive extends Configured implements Tool {
 		
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(NeuronHiveWritable.class);
+		job.setPartitionerClass(Output4HivePartitioner.class);
 		
-		job.setOutputKeyClass(IntWritable.class);
+		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setNumReduceTasks(0);
+		job.setNumReduceTasks(sim_time);
 
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
