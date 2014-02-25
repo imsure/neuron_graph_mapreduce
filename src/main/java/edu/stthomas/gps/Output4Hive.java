@@ -61,17 +61,17 @@ public class Output4Hive extends Configured implements Tool {
 
 		job.setMapperClass(Output4HiveMapper.class);
 		job.setReducerClass(Output4HiveReducer.class);
-
+		job.setPartitionerClass(Output4HivePartitioner.class);
+		
 		job.setInputFormatClass(SequenceFileInputFormat.class);
 		
 		LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
 		
-		MultipleOutputs.addNamedOutput(job, "neuron", TextOutputFormat.class, 
-				IntWritable.class, Text.class);
+		//MultipleOutputs.addNamedOutput(job, "neuron", TextOutputFormat.class, 
+		//		IntWritable.class, Text.class);
 		
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(NeuronHiveWritable.class);
-		job.setPartitionerClass(Output4HivePartitioner.class);
 		
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);

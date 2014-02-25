@@ -4,6 +4,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hadoop.io.Writable;
+
 /**
  * The writable is intended to transform the 'NeuronWritable' object
  * into a slightly different format in order to export data to hive.
@@ -14,7 +16,7 @@ import java.io.IOException;
  * @author imsure
  *
  */
-public class NeuronHiveWritable {
+public class NeuronHiveWritable implements Writable {
 
 	public char type = 0;
 	public int id = 0;

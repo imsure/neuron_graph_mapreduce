@@ -40,7 +40,7 @@ extends Reducer<IntWritable, NeuronHiveWritable, NullWritable, Text> {
 	@Override
 	public void reduce(IntWritable key, Iterable<NeuronHiveWritable> values, Context context) 
 			throws IOException, InterruptedException {
-		String path = "" + "time=" + key;
+		String path = "" + "time=" + key + "/part";
 		for (NeuronHiveWritable neuron : values) {
 			data.set(neuron.toString());
 			multipleOutputs.write(NullWritable.get(), data, path);

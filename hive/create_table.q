@@ -1,7 +1,9 @@
 DROP TABLE neurons;
 
-CREATE EXTERNAL TABLE neurons (type STRING, recovery FLOAT, 
-potential FLOAT, synaptic FLOAT, firing STRING)
+CREATE EXTERNAL TABLE neurons (type STRING, id INT,
+recovery FLOAT, potential FLOAT, synaptic FLOAT, firing STRING)
 PARTITIONED BY (time INT)
-ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 STORED AS TEXTFILE LOCATION '/user/shuo/neuron_hive';
+
+
