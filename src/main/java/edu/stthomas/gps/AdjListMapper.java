@@ -39,6 +39,7 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 		
 		float eweight = context.getConfiguration().getFloat("EW", EWeight);
 		float iweight = context.getConfiguration().getFloat("IW", IWeight);
+		System.err.println("eweight: " + eweight + "\tiweight: " + iweight);
 		
 		for (int i = start_id; i <= end_id; i++) {
 			neuron_id.set(i);
@@ -65,6 +66,7 @@ public class AdjListMapper extends Mapper<LongWritable, Text, IntWritable, AdjLi
 						weight.setID(j);
 						weight.setWeight((float)iweight*randn.nextFloat());
 						adjlist.add(weight);
+						//System.err.println("weight: " + weight.toString());
 					}
 				}
 			}
